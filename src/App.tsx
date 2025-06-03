@@ -14,6 +14,7 @@ import AddCourse from "./pages/AddCourse"
 import AddLesson from "./pages/AddLesson"
 import Notes from "./pages/Notes"
 import Purchase from "./pages/Purchase"
+import CourseStudents from "./pages/CourseStudents"
 
 function App() {
   const { user, loading } = useAuth()
@@ -50,6 +51,7 @@ function App() {
           <>
             <Route path="/add-course" element={<AddCourse />} />
             <Route path="/add-lesson" element={<AddLesson />} />
+            <Route path="/course/:courseId/students" element={<CourseStudents />} />
           </>
         )}
         <Route path="*" element={<Navigate to="/" />} />

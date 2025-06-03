@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { folderApi } from "../services/api"
 import { useAuth } from "../contexts/AuthContext"
@@ -10,26 +10,67 @@ import { BookOpen, Save, AlertCircle, CheckCircle } from "lucide-react"
 const AddCourse: React.FC = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
+
   const [formData, setFormData] = useState({
     categoryId: 1,
-    courseId:2,
+    courseId: 0, // יתעדכן אוטומטית
     title: "",
     description: "",
+    price: 0,  // הוספתי שדה מחיר כאן
   })
+
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
 
-  // const categories = [
-  //   { id: 1, name: "מתמטיקה" },
-  //   { id: 2, name: "מדעי המחשב" },
-  //   { id: 3, name: "פיזיקה" },
-  //   { id: 4, name: "כימיה" },
-  //   { id: 5, name: "ביולוגיה" },
-  //   { id: 6, name: "היסטוריה" },
-  //   { id: 7, name: "ספרות" },
-  //   { id: 8, name: "אנגלית" },
-  // ]
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const allFolders = await folderApi.getAllFolders()
+        const cat = allFolders.filter((f: any) => f.categoryId && !f.courseId)
+        const formatted = cat.map((c: any) => ({
+          id: c.categoryId,
+          name: c.title,
+        }))
+        setCategories(formatted)
+        if (formatted.length > 0) {
+          setFormData((prev) => ({
+            ...prev,
+            categoryId: formatted[0].id,
+          }))
+        }
+      } catch (err) {
+        console.error("שגיאה בשליפת קטגוריות", err)
+        setError("לא ניתן לטעון קטגוריות")
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  useEffect(() => {
+    const fetchNextCourseId = async () => {
+      try {
+        const allFolders = await folderApi.getAllFolders()
+        const courses = allFolders.filter(
+          (f: any) => f.categoryId && f.courseId && f.teacherId && !f.lessonId
+        )
+        const maxCourseId = courses.reduce((max: number, course: any) => {
+          return course.courseId > max ? course.courseId : max
+        }, 0)
+        setFormData((prev) => ({
+          ...prev,
+          courseId: maxCourseId + 1,
+        }))
+      } catch (err) {
+        console.error("שגיאה בחישוב מזהה הקורס", err)
+        setError("לא ניתן לחשב מזהה קורס חדש")
+      }
+    }
+
+    fetchNextCourseId()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,23 +78,16 @@ const AddCourse: React.FC = () => {
     setLoading(true)
 
     try {
-      // const courseData = {
-      //   categoryId: formData.categoryId,
-      //   courseId: Date.now(), // Generate unique course ID
-      //   teacherId: user?.userId,
-      //   teacherName: user?.userName,
-      //   title: formData.title,
-      //   description: formData.description,
-      //   numberOfLessons: 0, // Will be updated when lessons are added
-      // }
       const courseData = {
         categoryId: Number(formData.categoryId),
+        courseId: formData.courseId,
         teacherId: user?.userId,
         teacherName: user?.userName,
         title: formData.title,
         description: formData.description,
         numberOfLessons: 0,
-      }      
+        price: Number(formData.price), // כולל מחיר בקורס
+      }
 
       console.log("courseData:", courseData)
       await folderApi.addCourse(courseData)
@@ -70,9 +104,10 @@ const AddCourse: React.FC = () => {
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: name === "price" ? Number(value) : value,
     })
   }
 
@@ -158,6 +193,24 @@ const AddCourse: React.FC = () => {
               onChange={handleInputChange}
               className="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               placeholder="תאר את הקורס ומה התלמידים ילמדו בו"
+            />
+          </div>
+
+          {/* שדה מחיר */}
+          <div>
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
+              מחיר הקורס (בשקלים)
+            </label>
+            <input
+              id="price"
+              name="price"
+              type="number"
+              min={0}
+              required
+              value={formData.price}
+              onChange={handleInputChange}
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="הכנס מחיר בקורס"
             />
           </div>
 
