@@ -130,16 +130,19 @@ const Categories: React.FC = () => {
       const categoryMap = new Map<number, Category>()
 
       folders.forEach((folder: any) => {
+      
         const id = folder.categoryId
         if (id !== null && id !== undefined) {
           if (!categoryMap.has(id)) {
             categoryMap.set(id, {
               categoryId: id,
-              categoryName: `קטגוריה ${id}`,
+              categoryName: `קטגוריה ${folder.title}`,
               courseCount: 0,
             })
           }
+       
           categoryMap.get(id)!.courseCount++
+         
         }
       })
 

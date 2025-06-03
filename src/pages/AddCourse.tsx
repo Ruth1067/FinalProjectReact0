@@ -12,6 +12,7 @@ const AddCourse: React.FC = () => {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     categoryId: 1,
+    courseId:2,
     title: "",
     description: "",
   })
@@ -19,16 +20,16 @@ const AddCourse: React.FC = () => {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
 
-  const categories = [
-    { id: 1, name: "מתמטיקה" },
-    { id: 2, name: "מדעי המחשב" },
-    { id: 3, name: "פיזיקה" },
-    { id: 4, name: "כימיה" },
-    { id: 5, name: "ביולוגיה" },
-    { id: 6, name: "היסטוריה" },
-    { id: 7, name: "ספרות" },
-    { id: 8, name: "אנגלית" },
-  ]
+  // const categories = [
+  //   { id: 1, name: "מתמטיקה" },
+  //   { id: 2, name: "מדעי המחשב" },
+  //   { id: 3, name: "פיזיקה" },
+  //   { id: 4, name: "כימיה" },
+  //   { id: 5, name: "ביולוגיה" },
+  //   { id: 6, name: "היסטוריה" },
+  //   { id: 7, name: "ספרות" },
+  //   { id: 8, name: "אנגלית" },
+  // ]
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

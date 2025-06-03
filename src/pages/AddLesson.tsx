@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { folderApi, uploadApi, userApi } from "../services/api"
 import { useAuth } from "../contexts/AuthContext"
 import { Upload, Save, AlertCircle, CheckCircle, FileAudio } from "lucide-react"
+import axios from "axios"
 
 interface Course {
   folderId: number
@@ -85,16 +86,38 @@ const AddLesson: React.FC = () => {
         title: formData.title,
         description: formData.description,
       }
-
+      
+      console.log(lessonData)    
       await folderApi.addLesson(lessonData)
       setSuccess(true)
 
       setTimeout(() => {
         navigate("/my-courses")
       }, 2000)
-    } catch (err: any) {
-      setError("שגיאה בהוספת השיעור. אנא נסה שוב.")
-    } finally {
+    } 
+    // catch (err: any) {
+    //   setError("שגיאה בהוספת השיעור. אנא נסה שוב.")
+    // } 
+    catch (err: any) {
+      if (axios.isAxiosError(err)) {
+        // שגיאה מ-axios עם תגובה מהשרת
+        if (err.response) {
+          // מציגים הודעה שמגיעה מהשרת, אם יש
+          console.log(err.response.data?.message || `שגיאה: ${err.response.status} ${err.response.statusText}`);
+         
+        } else if (err.request) {
+          // בקשה נשלחה אך לא התקבלה תגובה
+          console.log("לא התקבלה תגובה מהשרת. אנא בדוק את החיבור שלך.");
+        } else {
+          // שגיאה אחרת
+          console.log("שגיאה לא ידועה: " + err.message);
+        }
+      } else {
+        console.log("שגיאה לא צפויה: " + err);
+      }
+    }
+    
+    finally {
       setLoading(false)
       setUploading(false)
     }
