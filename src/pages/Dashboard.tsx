@@ -111,7 +111,26 @@ const Dashboard: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* Stats Section */}
+      {/* <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">סטטיסטיקות</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-blue-600">0</div>
+            <div className="text-sm text-gray-600">{isTeacher ? "קורסים שיצרתי" : "קורסים שרכשתי"}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-green-600">0</div>
+            <div className="text-sm text-gray-600">{isTeacher ? "תלמידים רשומים" : "שיעורים שצפיתי"}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-purple-600">0</div>
+            <div className="text-sm text-gray-600">{isTeacher ? "שיעורים שהעלתי" : "הערות שכתבתי"}</div>
+          </div> */}
         </div>
+      // </div>
+    // </div>
   )
 }
 

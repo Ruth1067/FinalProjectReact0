@@ -48,6 +48,7 @@ const AddLesson: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      // Check if file is audio
       if (file.type.startsWith("audio/")) {
         setSelectedFile(file)
         setError("")
@@ -70,14 +71,16 @@ const AddLesson: React.FC = () => {
     }
 
     try {
+      // Upload file to AWS
       setUploading(true)
       await uploadApi.uploadFile(selectedFile)
       setUploading(false)
 
+      // Create lesson record
       const lessonData = {
-        categoryId: 1,
+        categoryId: 1, // Will be determined by course
         courseId: Number.parseInt(formData.courseId),
-        lessonId: Date.now(),
+        lessonId: Date.now(), // Generate unique lesson ID
         teacherId: user?.userId,
         teacherName: user?.userName,
         title: formData.title,
@@ -92,19 +95,21 @@ const AddLesson: React.FC = () => {
         navigate("/my-courses")
       }, 2000)
     } 
-
+    // catch (err: any) {
+    //   setError("שגיאה בהוספת השיעור. אנא נסה שוב.")
+    // } 
     catch (err: any) {
       if (axios.isAxiosError(err)) {
-        
+        // שגיאה מ-axios עם תגובה מהשרת
         if (err.response) {
-          
+          // מציגים הודעה שמגיעה מהשרת, אם יש
           console.log(err.response.data?.message || `שגיאה: ${err.response.status} ${err.response.statusText}`);
          
         } else if (err.request) {
-       
+          // בקשה נשלחה אך לא התקבלה תגובה
           console.log("לא התקבלה תגובה מהשרת. אנא בדוק את החיבור שלך.");
         } else {
-          
+          // שגיאה אחרת
           console.log("שגיאה לא ידועה: " + err.message);
         }
       } else {
