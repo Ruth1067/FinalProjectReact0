@@ -31,11 +31,9 @@ const LessonView: React.FC = () => {
         setLesson(folder)
 
         if (folder.audioFileName) {
-          // נניח שיש לך endpoint קבוע שמייצר את ה-URL לפי שם הקובץ (לדוגמה: https://your-bucket.s3.amazonaws.com/{fileName})
           const audioUrl = `https://your-bucket-name.s3.amazonaws.com/${folder.audioFileName}`
           setAudioUrl(audioUrl)
 
-          // שליפת תמלול
           const transcript = await uploadApi.getTranscript(folder.audioFileName)
           setTranscription(transcript)
         }

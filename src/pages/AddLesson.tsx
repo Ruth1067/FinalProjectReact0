@@ -100,16 +100,12 @@ const AddLesson: React.FC = () => {
     // } 
     catch (err: any) {
       if (axios.isAxiosError(err)) {
-        // שגיאה מ-axios עם תגובה מהשרת
         if (err.response) {
-          // מציגים הודעה שמגיעה מהשרת, אם יש
           console.log(err.response.data?.message || `שגיאה: ${err.response.status} ${err.response.statusText}`);
          
         } else if (err.request) {
-          // בקשה נשלחה אך לא התקבלה תגובה
           console.log("לא התקבלה תגובה מהשרת. אנא בדוק את החיבור שלך.");
         } else {
-          // שגיאה אחרת
           console.log("שגיאה לא ידועה: " + err.message);
         }
       } else {
