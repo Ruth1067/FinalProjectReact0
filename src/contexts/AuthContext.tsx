@@ -12,12 +12,26 @@ interface User {
   role: string
 }
 
+// interface Course {
+//   folderId: number
+//   courseId: number
+//   teacherId: number
+//   teacherName: string
+//   title: string
+//   description: string
+//   numberOfLessons: number
+//   categoryId: number
+//   isPurchased?: boolean
+//   price: number
+// }
+
 interface AuthContextType {
   user: User | null
   login: (email: string, password: string) => Promise<void>
   register: (userData: RegisterData) => Promise<void>
   logout: () => void
   loading: boolean
+  // course: Course | null
 }
 
 interface RegisterData {
@@ -87,7 +101,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
-    loading,
+    loading
+    // course,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -15,6 +15,7 @@ import AddLesson from "./pages/AddLesson"
 import Notes from "./pages/Notes"
 import Purchase from "./pages/Purchase"
 import CourseStudents from "./pages/CourseStudents"
+import Home from "./pages/Home"
 
 function App() {
   const { user, loading } = useAuth()
@@ -30,12 +31,25 @@ function App() {
   if (!user) {
     return (
       <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     )
   }
+  
+  // if (!user) {
+  //   return (
+  //     <Routes>
+  //       <Route path="*" element={<Navigate to="/home" />} />
+  //       <Route path="/login" element={<Login />} />
+  //       <Route path="/register" element={<Register />} />
+  //       {/* <Route path="*" element={<Navigate to="/login" />} /> */}
+  //     </Routes>
+  //   )
+  // }
 
   return (
     <Layout>
@@ -51,7 +65,7 @@ function App() {
           <>
             <Route path="/add-course" element={<AddCourse />} />
             <Route path="/add-lesson" element={<AddLesson />} />
-            <Route path="/course/:courseId/students" element={<CourseStudents />} />
+            <Route path="/course/:folderId/students" element={<CourseStudents />} />
           </>
         )}
         <Route path="*" element={<Navigate to="/" />} />
