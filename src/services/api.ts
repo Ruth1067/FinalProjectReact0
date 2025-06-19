@@ -1,7 +1,7 @@
 import axios from "axios";
 // import type { Note } from '../pages/Notes'; // עדכן את הנתיב הנכון
 
-const API_BASE_URL = "https://localhost:7183";
+const API_BASE_URL = "https://learnaheadserver.onrender.com";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
