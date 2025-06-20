@@ -179,11 +179,20 @@ export const uploadApi = {
     return response.data;
   },
 
-
-  getTranscript: async (fileName: string) => {
-    const response = await api.get(`/upload/transcript?fileName=${fileName}`);
-    return response.data.data;
-  }
+  downloadLesson: async (mediaFileName: string, transcriptFileName: string) => {
+    const response = await api.get("/upload/download-lesson", {
+      params: {
+        mediaFileName,
+        transcriptFileName,
+      },
+    });
+    return response.data;
+  },
+  
+  // getTranscript: async (fileName: string) => {
+  //   const response = await api.get(`/upload/transcript?fileName=${fileName}`);
+  //   return response.data.data;
+  // }
 };
 
 // ========== USER ==========
