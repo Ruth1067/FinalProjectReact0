@@ -103,7 +103,27 @@ export const folderApi = {
       }
     });
     return response.data;
-  }
+  },
+  updateCourse: async (folderId: number, data: any) => {
+    const response = await api.put(`/api/folder/update-course/${folderId}`, data)
+    return response.data;
+  },
+
+  // מחיקת קורס
+  deleteCourse: async (folderId: number) => {
+    const response = await api.delete(`/api/folder/delete-course/${folderId}`)
+    return response;
+  },
+  updateLesson: async (folderId: number, updated: { title?: string; description?: string }) => {
+    const res = await api.put(`/api/folder/update-lesson/${folderId}`, updated)
+    return res.data
+  },
+  
+  deleteLesson: async (folderId: number) => {
+    const res = await api.delete(`/api/folder/delete-lesson/${folderId}`)
+    return res.data
+  },
+  
 
   // sendTeacherEmail: async (folderId: number) => {
   //   const bodyHtml = prompt("אנא הכנס את תוכן המייל:");
@@ -139,6 +159,9 @@ export const folderApi = {
   //   console.error("שגיאה בבקשה:", error);
   //   throw error; // כך תוכל לתפוס את השגיאה בחלק הקורא
   // }
+
+  // עדכון קורס
+
 }
 
 
