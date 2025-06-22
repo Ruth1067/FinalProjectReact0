@@ -391,7 +391,8 @@ import type React from "react"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
-import { ArrowLeft, User, Mail, Phone, GraduationCap } from "lucide-react"
+import { ArrowLeft, User, Mail, Phone, GraduationCap, Circle } from "lucide-react"
+import Login from "./Login"
 
 const Register: React.FC = () => {
   const navigate = useNavigate()
@@ -529,9 +530,14 @@ const Register: React.FC = () => {
                   className="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-xl shadow-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 font-semibold"
                 >
                   {loading ? (
-                    <span>מבצע רישום...</span>
+                     <div className="flex items-center">
+                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent ml-2"></div>
+                     <span>מבצע רישום...</span>
+                   </div>
                   ) : (
+                    <div className="flex items-center">
                     <span>הירשם</span>
+                  </div>
                   )}
                 </button>
 

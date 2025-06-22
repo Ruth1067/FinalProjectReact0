@@ -1352,10 +1352,17 @@ const CourseView: React.FC = () => {
             <p className="text-gray-600">{course.description}</p>
             <p className="text-sm text-gray-500">מורה: {course.teacherName}</p>
           </div>
-          <button onClick={() => setShowEmailDialog(true)} className="px-4 py-2 bg-blue-600 text-white rounded">
+          {/* <button onClick={() => setShowEmailDialog(true)} className="px-4 py-2 bg-blue-600 text-white rounded">
             שלח מייל
-          </button>
+          </button> */}
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">שלח מייל למורה</h3>
+            <button onClick={() => setShowEmailDialog(true)} className="text-gray-400 hover:text-gray-600">
+              {/* <X className="h-5 w-5" /> */}
+            </button>
+          </div>
         </div>
+        
       </div>
 
       {showEmailDialog && (
