@@ -978,7 +978,8 @@ const AddLesson: React.FC = () => {
       setUploading(false);
 
       console.log(lessonData);
-      await folderApi.addLesson(lessonData, lessonData.courseId, lessonData.lessonId);
+      await folderApi.addLesson(lessonData);
+      // await folderApi.addLesson(lessonData, lessonData.courseId, lessonData.lessonId);
       setSuccess(true);
 
       setTimeout(() => {

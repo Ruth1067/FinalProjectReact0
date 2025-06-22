@@ -52,14 +52,18 @@ export const folderApi = {
   //   const response = await api.post("/api/folder/add-lesson", lessonData, courseId, lessonId);
   //   return response.data;
   // },
-  addLesson: async (lessonData: any, courseId: number, lessonId: number) => {
-    const response = await api.post("/api/folder/add-lesson", {
-        lessonData,
-        courseId,
-        lessonId,
-    });
+  //   addLesson: async (lessonData: any, courseId: number, lessonId: number) => {
+  //     const response = await api.post("/api/folder/add-lesson", {
+  //         lessonData,
+  //         courseId,
+  //         lessonId,
+  //     });
+  //     return response.data;
+  // },
+  addLesson: async (lessonData: any) => {
+    const response = await api.post("/api/folder/add-lesson", lessonData);
     return response.data;
-},
+  },
 
 
   getFolderById: async (id: number) => {
@@ -79,7 +83,7 @@ export const folderApi = {
     const response = await api.get(`/api/folder/check-purchase/${folderId}`);
     return response.data;
   },
-  
+
 
   getCourseStudents: async (folderId: number) => {
     const res = await api.get(`/api/folder/${folderId}/students`);
@@ -188,7 +192,7 @@ export const uploadApi = {
     });
     return response.data;
   },
-  
+
   // getTranscript: async (fileName: string) => {
   //   const response = await api.get(`/upload/transcript?fileName=${fileName}`);
   //   return response.data.data;
