@@ -5,7 +5,7 @@ import { useParams, Link } from "react-router-dom"
 import { folderApi } from "../services/api"
 import { useAuth } from "../contexts/AuthContext"
 import { Users, ArrowLeft } from "lucide-react"
-import { title } from "process"
+// import { title } from "process"
 
 interface Student {
   id: number
