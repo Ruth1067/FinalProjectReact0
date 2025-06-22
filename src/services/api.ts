@@ -200,15 +200,24 @@ export const uploadApi = {
   },
 
 
-  downloadLesson: async (mediaFileName: string, transcriptFileName: string) => {
+  // downloadLesson: async (mediaFileName: string, transcriptFileName: string) => {
+  //   const response = await api.get("/upload/download-lesson", {
+  //     params: {
+  //       mediaFileName,
+  //       transcriptFileName,
+  //     },
+  //   });
+  //   return response.data;
+  // },
+  downloadLesson: async (courseId: number, lessonId: number) => {
     const response = await api.get("/upload/download-lesson", {
       params: {
-        mediaFileName,
-        transcriptFileName,
+        courseId,
+        lessonId,
       },
     });
     return response.data;
-  },
+  }
 
   // getTranscript: async (fileName: string) => {
   //   const response = await api.get(`/upload/transcript?fileName=${fileName}`);

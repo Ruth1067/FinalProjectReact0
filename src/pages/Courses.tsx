@@ -6,6 +6,7 @@ import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useFolders } from "../contexts/FoldersProvider";
 import { BookOpen, ShoppingCart, Play } from "lucide-react";
+import { title } from "process";
 
 // הגדרת Course לפי צרכי הרכיב
 interface Course {
@@ -66,7 +67,7 @@ const Courses: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">קורסים בקטגוריה {categoryId}</h1>
+        <h1 className="text-3xl font-bold text-gray-900">קורסים בקטגוריה {title}</h1>
         <p className="mt-2 text-gray-600">בחר קורס כדי לצפות בפרטים או לרכוש</p>
       </div>
 

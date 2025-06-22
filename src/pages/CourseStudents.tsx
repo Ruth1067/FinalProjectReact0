@@ -5,6 +5,7 @@ import { useParams, Link } from "react-router-dom"
 import { folderApi } from "../services/api"
 import { useAuth } from "../contexts/AuthContext"
 import { Users, ArrowLeft } from "lucide-react"
+import { title } from "process"
 
 interface Student {
   id: number
@@ -14,6 +15,7 @@ interface Student {
 
 const CourseStudents: React.FC = () => {
   const { folderId } = useParams<{ folderId: string }>()
+  const { title } = useParams<{ title: string }>()
   // const { course } = useAuth()
   const { user } = useAuth()
   const [students, setStudents] = useState<Student[]>([])
@@ -77,7 +79,7 @@ const CourseStudents: React.FC = () => {
 
       <h1 className="text-2xl font-bold mb-4 flex items-center space-x-2 space-x-reverse">
         <Users className="h-6 w-6" />
-        <span>תלמידים בקורס {folderId}</span>
+        <span>תלמידים בקורס {title}</span>
       </h1>
 
       {students.length === 0 ? (
