@@ -6,7 +6,6 @@ import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useFolders } from "../contexts/FoldersProvider";
 import { BookOpen, ShoppingCart, Play } from "lucide-react";
-import { title } from "process";
 
 // הגדרת Course לפי צרכי הרכיב
 interface Course {
@@ -25,15 +24,26 @@ const Courses: React.FC = () => {
   const { user } = useAuth();
   const { folders, loading: foldersLoading, checkIfCoursePurchased } = useFolders();
   const [courses, setCourses] = useState<Course[]>([]);
+  const [categoryTitle, setCategoryTitle] = useState<string>("");
 
   useEffect(() => {
     if (!foldersLoading && folders.length > 0 && categoryId) {
-      const filteredCourses: Course[] = folders
-        .filter((folder) =>
+      // מציאת שם הקטגוריה מתוך תיקיית הקטגוריה
+      const categoryFolder = folders.find(
+        (folder) =>
           folder.categoryId === Number(categoryId) &&
-          folder.courseId !== null &&
-          folder.lessonId === null &&
-          folder.teacherId !== null
+          folder.courseId === null &&
+          folder.lessonId === null
+      );
+      setCategoryTitle(categoryFolder?.title || "קטגוריה לא ידועה");
+
+      const filteredCourses: Course[] = folders
+        .filter(
+          (folder) =>
+            folder.categoryId === Number(categoryId) &&
+            folder.courseId !== null &&
+            folder.lessonId === null &&
+            folder.teacherId !== null
         )
         .map((folder) => {
           const lessonCount = folders.filter(
@@ -48,7 +58,7 @@ const Courses: React.FC = () => {
             title: folder.title || "ללא כותרת",
             description: folder.description || "",
             numberOfLessons: lessonCount,
-            categoryId: folder.categoryId
+            categoryId: folder.categoryId,
           };
         });
 
@@ -67,7 +77,7 @@ const Courses: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">קורסים בקטגוריה {title}</h1>
+        <h1 className="text-3xl font-bold text-gray-900">קורסים בקטגוריה {categoryTitle}</h1>
         <p className="mt-2 text-gray-600">בחר קורס כדי לצפות בפרטים או לרכוש</p>
       </div>
 
@@ -155,6 +165,164 @@ const CourseItem: React.FC<{
 };
 
 export default Courses;
+
+// "use client";
+
+// import type React from "react";
+// import { useState, useEffect } from "react";
+// import { useParams, Link } from "react-router-dom";
+// import { useAuth } from "../contexts/AuthContext";
+// import { useFolders } from "../contexts/FoldersProvider";
+// import { BookOpen, ShoppingCart, Play } from "lucide-react";
+// // import { title } from "process";
+
+// // הגדרת Course לפי צרכי הרכיב
+// interface Course {
+//   folderId: number;
+//   courseId: number;
+//   teacherId: number;
+//   teacherName: string;
+//   title: string;
+//   description: string;
+//   numberOfLessons: number;
+//   categoryId: number;
+// }
+
+// const Courses: React.FC = () => {
+//   const { categoryId } = useParams<{ categoryId: string }>();
+//   const { user } = useAuth();
+//   const { folders, loading: foldersLoading, checkIfCoursePurchased } = useFolders();
+//   const [courses, setCourses] = useState<Course[]>([]);
+
+//   useEffect(() => {
+//     if (!foldersLoading && folders.length > 0 && categoryId) {
+//       const filteredCourses: Course[] = folders
+//         .filter((folder) =>
+//           folder.categoryId === Number(categoryId) &&
+//           folder.courseId !== null &&
+//           folder.lessonId === null &&
+//           folder.teacherId !== null
+//         )
+//         .map((folder) => {
+//           const lessonCount = folders.filter(
+//             (f) => f.courseId === folder.courseId && f.lessonId !== null
+//           ).length;
+
+//           return {
+//             folderId: folder.folderId,
+//             courseId: folder.courseId!,
+//             teacherId: folder.teacherId!,
+//             teacherName: folder.teacherName || "מורה לא ידוע",
+//             title: folder.title || "ללא כותרת",
+//             description: folder.description || "",
+//             numberOfLessons: lessonCount,
+//             categoryId: folder.categoryId
+//           };
+//         });
+
+//       setCourses(filteredCourses);
+//     }
+//   }, [folders, foldersLoading, categoryId]);
+
+//   if (foldersLoading) {
+//     return (
+//       <div className="flex justify-center items-center h-64">
+//         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="space-y-8">
+//       <div>
+//         <h1 className="text-3xl font-bold text-gray-900">קורסים בקטגוריה {title}</h1>
+//         <p className="mt-2 text-gray-600">בחר קורס כדי לצפות בפרטים או לרכוש</p>
+//       </div>
+
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//         {courses.map((course) => (
+//           <CourseItem
+//             key={course.folderId}
+//             course={course}
+//             userId={user?.userId}
+//             role={user?.role}
+//             checkIfCoursePurchased={checkIfCoursePurchased}
+//           />
+//         ))}
+//       </div>
+
+//       {courses.length === 0 && (
+//         <div className="text-center py-12">
+//           <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+//           <h3 className="text-lg font-medium text-gray-900 mb-2">אין קורסים זמינים</h3>
+//           <p className="text-gray-600">בקרוב יתווספו קורסים חדשים לקטגוריה זו</p>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// const CourseItem: React.FC<{
+//   course: Course;
+//   userId?: number;
+//   role?: string;
+//   checkIfCoursePurchased: (folderId: number) => Promise<boolean>;
+// }> = ({ course, userId, role, checkIfCoursePurchased }) => {
+//   const [canView, setCanView] = useState<boolean>(false);
+
+//   useEffect(() => {
+//     const checkPermission = async () => {
+//       if (role === "Teacher" && course.teacherId === userId) {
+//         setCanView(true);
+//       } else {
+//         const result = await checkIfCoursePurchased(course.folderId);
+//         setCanView(result);
+//       }
+//     };
+//     checkPermission();
+//   }, [userId, role, course, checkIfCoursePurchased]);
+
+//   return (
+//     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+//       <div className="p-6">
+//         <div className="flex items-center space-x-2 space-x-reverse mb-3">
+//           <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+//             <BookOpen className="h-5 w-5 text-blue-600" />
+//           </div>
+//           <div>
+//             <h3 className="text-lg font-semibold text-gray-900">{course.title}</h3>
+//             <p className="text-sm text-gray-600">{course.teacherName}</p>
+//           </div>
+//         </div>
+
+//         <p className="text-gray-600 text-sm mb-2 line-clamp-3">{course.description}</p>
+//         <p className="text-gray-500 text-xs mb-4">מספר שיעורים: {course.numberOfLessons}</p>
+
+//         <div className="flex space-x-2 space-x-reverse">
+//           {canView ? (
+//             <Link
+//               to={`/course/${course.courseId}`}
+//               className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1 space-x-reverse"
+//             >
+//               <Play className="h-4 w-4" />
+//               <span>צפה בקורס</span>
+//             </Link>
+//           ) : (
+//             <Link
+//               to={`/purchase/${course.courseId}`}
+//               className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1 space-x-reverse"
+//             >
+//               <ShoppingCart className="h-4 w-4" />
+//               <span>לרכישה</span>
+//             </Link>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Courses;
 
 
 // "use client";
