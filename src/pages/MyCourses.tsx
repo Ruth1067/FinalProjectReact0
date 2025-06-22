@@ -392,7 +392,7 @@ import React, { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { folderApi } from "../services/api"
 import { useAuth } from "../contexts/AuthContext"
-import { BookOpen, Users, Play, Pencil, Trash } from "lucide-react"
+import { BookOpen, Users, Play } from "lucide-react"
 
 interface Course {
   folderId: number
@@ -409,11 +409,18 @@ interface Course {
 
 const MyCourses: React.FC = () => {
   const { user } = useAuth()
+  if (!user) return null
+
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
 
+  const [editingCourseId, setEditingCourseId] = useState<number | null>(null)
+  const [editData, setEditData] = useState({ title: "", description: "" })
+
   useEffect(() => {
-    if (user) loadMyCourses()
+    if (user) {
+      loadMyCourses()
+    }
   }, [user])
 
   const loadMyCourses = async () => {
@@ -430,18 +437,16 @@ const MyCourses: React.FC = () => {
 
       let filteredCourses: Course[] = []
 
-      if (user!.role === "Teacher") {
+      if (user.role === "Teacher") {
         filteredCourses = allCourses.filter(
-          (course: { teacherId: number }) => course.teacherId === user!.userId
+          (course: { teacherId: number }) => course.teacherId === user.userId
         )
       } else {
-        const purchasedCourses = await Promise.all(
-          allCourses.map(async (course: { folderId: number }) => {
-            const isPurchased = await folderApi.checkIfCoursePurchased(course.folderId)
-            return isPurchased ? course : null
-          })
-        )
-        filteredCourses = purchasedCourses.filter(Boolean) as Course[]
+        const purchasedCourses = await Promise.all(allCourses.map(async (course: { folderId: number }) => {
+          const isPurchased = await folderApi.checkIfCoursePurchased(course.folderId)
+          return isPurchased ? course : null
+        }))
+        filteredCourses = purchasedCourses.filter(course => course !== null) as Course[]
       }
 
       setCourses(filteredCourses)
@@ -453,24 +458,34 @@ const MyCourses: React.FC = () => {
     }
   }
 
-  const handleEdit = (course: Course) => {
-    // כאן אפשר לפתוח מודל או לנווט לדף עריכה
-    alert(`עריכת הקורס "${course.title}" (כדאי לממש /edit-course/${course.folderId})`)
+  const handleEditClick = (course: Course) => {
+    setEditingCourseId(course.folderId)
+    setEditData({ title: course.title, description: course.description })
   }
 
-  const handleDelete = async (course: Course) => {
-    if (!window.confirm(`האם אתה בטוח שברצונך למחוק את הקורס "${course.title}"?`)) return
-
+  const handleUpdateCourse = async (folderId: number) => {
     try {
-      await folderApi.deleteCourse(course.folderId)
-      setCourses(prev => prev.filter(c => c.folderId !== course.folderId))
+      await folderApi.updateCourse(folderId, editData)
+      setCourses(prev =>
+        prev.map(course =>
+          course.folderId === folderId ? { ...course, ...editData } : course
+        )
+      )
+      setEditingCourseId(null)
     } catch (error) {
-      console.error("שגיאה במחיקת הקורס:", error)
-      alert("אירעה שגיאה במחיקת הקורס")
+      console.error("שגיאה בעדכון הקורס:", error)
     }
   }
 
-  if (!user) return null
+  const handleDeleteCourse = async (folderId: number) => {
+    if (!window.confirm("האם אתה בטוח שברצונך למחוק את הקורס?")) return
+    try {
+      await folderApi.deleteCourse(folderId)
+      setCourses(prev => prev.filter(course => course.folderId !== folderId))
+    } catch (error) {
+      console.error("שגיאה במחיקת הקורס:", error)
+    }
+  }
 
   if (loading) {
     return (
@@ -482,18 +497,18 @@ const MyCourses: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <header>
+      <div>
         <h1 className="text-3xl font-bold text-gray-900">
-          {user.role === "Teacher" ? "הקורסים שיצרתי" : "הקורסים שלי"}
+          {user?.role === "Teacher" ? "הקורסים שיצרתי" : "הקורסים שלי"}
         </h1>
         <p className="mt-2 text-gray-600">
-          {user.role === "Teacher"
+          {user?.role === "Teacher"
             ? "נהל את הקורסים שיצרת וצפה בתלמידים הרשומים"
             : "הקורסים שרכשת וזמינים לצפייה"}
         </p>
-      </header>
+      </div>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => (
           <div
             key={course.folderId}
@@ -525,7 +540,7 @@ const MyCourses: React.FC = () => {
                   <span>צפה בקורס</span>
                 </Link>
 
-                {user.role === "Teacher" && (
+                {user?.role === "Teacher" && (
                   <Link
                     to={`/course/${course.folderId}/students`}
                     className="bg-gray-100 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-200 transition-colors flex items-center space-x-1 space-x-reverse"
@@ -536,46 +551,73 @@ const MyCourses: React.FC = () => {
                 )}
               </div>
 
-              {user.role === "Teacher" && (
-                <div className="flex space-x-2 space-x-reverse mt-3">
+              {user?.role === "Teacher" && editingCourseId === course.folderId ? (
+                <div className="space-y-2 mt-4">
+                  <input
+                    type="text"
+                    className="w-full border rounded px-3 py-1"
+                    value={editData.title}
+                    onChange={e => setEditData({ ...editData, title: e.target.value })}
+                    placeholder="כותרת"
+                  />
+                  <textarea
+                    className="w-full border rounded px-3 py-1"
+                    value={editData.description}
+                    onChange={e => setEditData({ ...editData, description: e.target.value })}
+                    placeholder="תיאור"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                      onClick={() => handleUpdateCourse(course.folderId)}
+                    >
+                      שמור
+                    </button>
+                    <button
+                      className="bg-gray-300 text-gray-700 px-3 py-1 rounded hover:bg-gray-400"
+                      onClick={() => setEditingCourseId(null)}
+                    >
+                      ביטול
+                    </button>
+                  </div>
+                </div>
+              ) : user?.role === "Teacher" && (
+                <div className="flex gap-2 mt-4">
                   <button
-                    onClick={() => handleEdit(course)}
-                    className="flex-1 bg-yellow-500 text-white py-1 px-3 rounded-md hover:bg-yellow-600 transition-colors flex items-center justify-center space-x-1 space-x-reverse"
+                    className="text-blue-600 hover:underline text-sm"
+                    onClick={() => handleEditClick(course)}
                   >
-                    <Pencil className="h-4 w-4" />
-                    <span>ערוך</span>
+                    ערוך
                   </button>
-
                   <button
-                    onClick={() => handleDelete(course)}
-                    className="flex-1 bg-red-600 text-white py-1 px-3 rounded-md hover:bg-red-700 transition-colors flex items-center justify-center space-x-1 space-x-reverse"
+                    className="text-red-600 hover:underline text-sm"
+                    onClick={() => handleDeleteCourse(course.folderId)}
                   >
-                    <Trash className="h-4 w-4" />
-                    <span>מחק</span>
+                    מחק
                   </button>
                 </div>
               )}
             </div>
           </div>
         ))}
-      </section>
+      </div>
 
       {courses.length === 0 && (
         <div className="text-center py-12">
           <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {user.role === "Teacher" ? "עדיין לא יצרת קורסים" : "עדיין לא רכשת קורסים"}
+            {user?.role === "Teacher" ? "עדיין לא יצרת קורסים" : "עדיין לא רכשת קורסים"}
           </h3>
           <p className="text-gray-600 mb-4">
-            {user.role === "Teacher"
+            {user?.role === "Teacher"
               ? "התחל ליצור קורסים ולשתף את הידע שלך"
               : "עיין בקטגוריות השונות ורכוש קורסים מעניינים"}
           </p>
           <Link
-            to={user.role === "Teacher" ? "/add-course" : "/categories"}
+            to={user?.role === "Teacher" ? "/add-course" : "/categories"}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
           >
-            {user.role === "Teacher" ? "צור קורס חדש" : "עיין בקורסים"}
+            {user?.role === "Teacher" ? "צור קורס חדש" : "עיין בקורסים"}
           </Link>
         </div>
       )}

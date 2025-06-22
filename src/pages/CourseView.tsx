@@ -1186,300 +1186,292 @@
 // }
 
 // export default CourseView
-"use client";
-import type React from "react";
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { folderApi, uploadApi, userApi } from "../services/api";
-import { Play, FileText, Mail, Download, Edit2, Trash2 } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
+"use client"
+
+import React, { useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
+import { folderApi, uploadApi, userApi } from "../services/api"
+import { Play, FileText, Mail, Download } from "lucide-react"
+import { useAuth } from "../contexts/AuthContext"
 
 interface Course {
-  folderId: number;
-  courseId: number;
-  teacherId: number;
-  teacherName: string;
-  teacherEmail: string;
-  title: string;
-  description: string;
-  numberOfLessons: number;
+  folderId: number
+  courseId: number
+  teacherId: number
+  teacherName: string
+  teacherEmail: string
+  title: string
+  description: string
+  numberOfLessons: number
 }
 
 interface Lesson {
-  folderId: number;
-  lessonId: number;
-  courseId: number;
-  title: string;
-  description: string;
+  folderId: number
+  lessonId: number
+  courseId: number
+  title: string
+  description: string
+  audioUrl?: string
+  transcriptUrl?: string
 }
 
 const CourseView: React.FC = () => {
-  const { courseId } = useParams<{ courseId: string }>();
-  const { user } = useAuth();
+  const { user } = useAuth()
+  const { courseId } = useParams<{ courseId: string }>()
+  const [course, setCourse] = useState<Course | null>(null)
+  const [lessons, setLessons] = useState<Lesson[]>([])
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null)
+  const [transcript, setTranscript] = useState<string>("")
+  const [mediaUrl, setMediaUrl] = useState<string>("")
+  const [loading, setLoading] = useState(true)
+  const [loadingTranscript, setLoadingTranscript] = useState(false)
+  const [emailBody, setEmailBody] = useState<string>("")
+  const [showEmailDialog, setShowEmailDialog] = useState<boolean>(false)
 
-  const [course, setCourse] = useState<Course | null>(null);
-  const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-  const [transcript, setTranscript] = useState<string>("");
-  const [mediaUrl, setMediaUrl] = useState<string>("");
-  const [loading, setLoading] = useState(true);
-  const [loadingTranscript, setLoadingTranscript] = useState(false);
-  const [emailBody, setEmailBody] = useState<string>("");
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-
-  const isTeacher = Boolean(user && course && user.userId === course.teacherId);
+  const [editingLessonId, setEditingLessonId] = useState<number | null>(null)
+  const [lessonEditData, setLessonEditData] = useState({ title: "", description: "" })
 
   useEffect(() => {
-    loadCourseAndLessons();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId]);
+    loadCourseAndLessons()
+  }, [courseId])
 
   const loadCourseAndLessons = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const folders = await folderApi.getAllFolders();
-
-      const foundCourse = folders.find((f: { courseId: number; lessonId: null; }) =>
+      const folders = await folderApi.getAllFolders()
+      const foundCourse = folders.find((f: any) =>
         f.courseId === Number(courseId) &&
-        f.lessonId == null
-      );
+        f.lessonId == null &&
+        f.teacherId != null &&
+        f.title &&
+        f.description != null
+      )
       if (!foundCourse) {
-        setCourse(null);
-        return;
+        setCourse(null)
+        return
       }
-
-      const teacher = await userApi.getUserById(foundCourse.teacherId);
+      const teacher = await userApi.getUserById(foundCourse.teacherId)
       setCourse({
         folderId: foundCourse.folderId,
         courseId: foundCourse.courseId,
         teacherId: foundCourse.teacherId,
         teacherName: foundCourse.teacherName,
-        teacherEmail: teacher.email,
+        teacherEmail: teacher.email || "",
         title: foundCourse.title,
         description: foundCourse.description,
         numberOfLessons: foundCourse.numberOfLessons,
-      });
-
-      setLessons(
-        folders
-          .filter((f: { lessonId: null; courseId: number; }) => f.lessonId != null && f.courseId === Number(courseId))
-          .map((f: { folderId: any; lessonId: any; courseId: any; title: any; description: any; }) => ({
-            folderId: f.folderId,
-            lessonId: f.lessonId!,
-            courseId: f.courseId!,
-            title: f.title!,
-            description: f.description!,
-          }))
-      );
+      })
+      const relLessons = folders
+        .filter((f: any) => f.lessonId != null && f.courseId === Number(courseId))
+        .map((f: any) => ({
+          folderId: f.folderId,
+          lessonId: f.lessonId,
+          courseId: f.courseId,
+          title: f.title,
+          description: f.description,
+          audioUrl: f.audioUrl,
+          transcriptUrl: f.transcriptUrl,
+        }))
+      setLessons(relLessons)
     } catch (err) {
-      console.error(err);
+      console.error(err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const loadTranscriptAndMedia = async (lesson: Lesson) => {
-    setLoadingTranscript(true);
+  const selectLesson = async (lesson: Lesson) => {
+    setSelectedLesson(lesson)
+    setTranscript("")
+    setMediaUrl("")
+    setLessonEditData({ title: lesson.title, description: lesson.description })
+    setLoadingTranscript(true)
     try {
-      const data = await uploadApi.downloadLesson(lesson.courseId, lesson.lessonId);
-      setTranscript(data.transcriptText ?? "אין תמלול");
-      setMediaUrl(data.mediaUrl ?? "");
+      const data = await uploadApi.downloadLesson(lesson.courseId, lesson.lessonId)
+      setTranscript(data.transcriptText || "")
+      setMediaUrl(data.mediaUrl || "")
     } catch (err) {
-      console.error(err);
-      setTranscript("אין תמלול");
-      setMediaUrl("");
+      console.error(err)
     } finally {
-      setLoadingTranscript(false);
+      setLoadingTranscript(false)
     }
-  };
+  }
 
-  const selectLesson = (lesson: Lesson) => {
-    setSelectedLesson(lesson);
-    setTranscript("");
-    setMediaUrl("");
-    loadTranscriptAndMedia(lesson);
-  };
-
-  const sendEmailToTeacher = async () => {
-    if (!emailBody.trim()) return alert("יש להזין תוכן למייל");
+  const saveLesson = async () => {
+    if (!selectedLesson) return
     try {
-      await folderApi.sendTeacherEmail(course!.folderId, emailBody);
-      alert("המייל נשלח בהצלחה!");
-      setShowEmailDialog(false);
-      setEmailBody("");
-    } catch {
-      alert("שגיאה בשליחת המייל");
-    }
-  };
-
-  const editLesson = async (lesson: Lesson) => {
-    const newTitle = prompt("כותרת חדשה:", lesson.title);
-    const newDesc = prompt("תיאור חדש:", lesson.description);
-    if (newTitle == null || newDesc == null) return;
-    try {
-      await folderApi.updateLesson(lesson.folderId, { title: newTitle, description: newDesc });
+      await folderApi.updateLesson(selectedLesson.folderId, lessonEditData)
       setLessons(prev =>
         prev.map(l =>
-          l.lessonId === lesson.lessonId ? { ...l, title: newTitle, description: newDesc } : l
+          l.folderId === selectedLesson.folderId
+            ? { ...l, ...lessonEditData }
+            : l
         )
-      );
-      if (selectedLesson?.lessonId === lesson.lessonId) {
-        setSelectedLesson({ ...selectedLesson, title: newTitle, description: newDesc });
-      }
-      alert("עודכן בהצלחה!");
-    } catch {
-      alert("שגיאה בעדכון");
+      )
+      setSelectedLesson({ ...selectedLesson, ...lessonEditData })
+      setEditingLessonId(null)
+    } catch (err) {
+      console.error(err)
     }
-  };
+  }
 
-  const deleteLesson = async (lesson: Lesson) => {
-    if (!confirm(`למחוק את "${lesson.title}"?`)) return;
+  const removeLesson = async () => {
+    if (!selectedLesson || !window.confirm("להסיר את השיעור הזה?")) return
     try {
-      await folderApi.deleteLesson(lesson.folderId);
-      setLessons(prev => prev.filter(l => l.lessonId !== lesson.lessonId));
-      if (selectedLesson?.lessonId === lesson.lessonId) {
-        setSelectedLesson(null);
-        setTranscript("");
-        setMediaUrl("");
-      }
-      alert("נמחק בהצלחה");
-    } catch {
-      alert("שגיאה במחיקה");
+      await folderApi.deleteLesson(selectedLesson.folderId)
+      setLessons(prev => prev.filter(l => l.folderId !== selectedLesson.folderId))
+      setSelectedLesson(null)
+    } catch (err) {
+      console.error(err)
     }
-  };
+  }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
-    );
+  const sendEmailToTeacher = async () => {
+    if (!emailBody.trim()) return
+    try {
+      await folderApi.sendTeacherEmail(course!.folderId, emailBody)
+      setEmailBody("")
+      setShowEmailDialog(false)
+    } catch (err) {
+      console.error(err)
+    }
   }
-  if (!course) {
-    return (
-      <div className="text-center py-12">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">קורס לא נמצא</h3>
-        <p className="text-gray-600">הקורס המבוקש אינו קיים במערכת</p>
-      </div>
-    );
-  }
+
+  if (loading) return <div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-blue-600 border-b-2"/></div>
+  if (!course) return <div className="text-center py-12"><p className="text-lg">קורס לא קיים</p></div>
+
+  const isOwner = user?.userId === course.teacherId
 
   return (
     <div className="space-y-6">
-      {/* כותרת הקורס ופעולת מייל */}
-      <div className="bg-white rounded-lg shadow p-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">{course.title}</h1>
-          <p className="text-gray-600">{course.description}</p>
-          <p className="text-sm text-gray-500">מורה: {course.teacherName}</p>
+      {/* קורס */}
+      <div className="bg-white p-6 rounded shadow">
+        <div className="flex justify-between">
+          <div>
+            <h1 className="text-3xl">{course.title}</h1>
+            <p className="text-gray-600">{course.description}</p>
+            <p className="text-sm text-gray-500">מורה: {course.teacherName}</p>
+          </div>
+          <button onClick={() => setShowEmailDialog(true)} className="px-4 py-2 bg-blue-600 text-white rounded">
+            שלח מייל
+          </button>
         </div>
-        <button
-          onClick={() => setShowEmailDialog(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded flex items-center space-x-2"
-        >
-          <Mail className="h-4 w-4" />
-          <span>שלח מייל</span>
-        </button>
       </div>
 
-      {/* דיאלוג שליחת מייל */}
       {showEmailDialog && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-            <h2 className="text-lg mb-4">שלח מייל למורה</h2>
-            <p className="mb-2">אל: {course.teacherEmail}</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+          <div className="bg-white p-6 rounded shadow w-96">
+            <h2 className="text-xl mb-4">שלח מייל למורה</h2>
             <textarea
-              className="w-full border p-2 rounded mb-4"
-              placeholder="תוכן להודעה"
+              rows={5}
+              className="w-full border p-2"
+              placeholder="תוכן ההודעה"
               value={emailBody}
               onChange={e => setEmailBody(e.target.value)}
             />
-            <div className="flex justify-end space-x-2">
-              <button onClick={() => setShowEmailDialog(false)} className="px-4 py-2 bg-gray-300 rounded">
-                בטל
-              </button>
-              <button onClick={sendEmailToTeacher} className="px-4 py-2 bg-blue-600 text-white rounded">
-                שלח
-              </button>
+            <div className="mt-4 flex justify-end gap-2">
+              <button className="px-4 py-2 bg-gray-300 rounded" onClick={() => setShowEmailDialog(false)}>ביטול</button>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded" onClick={sendEmailToTeacher}>שלח</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* רשימת שיעורים ופרטים */}
+      {/* תוכן */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white rounded shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">שיעורים</h2>
-          <div className="space-y-2">
+        {/* רשימת שיעורים */}
+        <div className="lg:col-span-1 bg-white rounded shadow p-6">
+          <h2 className="text-xl mb-4">שיעורים</h2>
+          <ul className="space-y-2">
             {lessons.map(l => (
-              <div key={l.lessonId} className="flex justify-between items-center">
+              <li key={l.lessonId}>
                 <button
+                  className={`w-full text-left p-2 rounded ${selectedLesson?.lessonId === l.lessonId ? "bg-blue-100" : "hover:bg-gray-100"}`}
                   onClick={() => selectLesson(l)}
-                  className={`flex-1 text-left p-2 rounded ${selectedLesson?.lessonId === l.lessonId ? "bg-blue-100" : "hover:bg-gray-100"}`}
                 >
-                  <Play className="inline-block mr-1" />
-                  <span>{l.title}</span>
+                  {l.title}
                 </button>
-                {isTeacher && (
-                  <div className="flex space-x-2">
-                    <button onClick={() => editLesson(l)} className="text-blue-600 hover:text-blue-800">
-                      <Edit2 />
-                    </button>
-                    <button onClick={() => deleteLesson(l)} className="text-red-600 hover:text-red-800">
-                      <Trash2 />
-                    </button>
+              </li>
+            ))}
+            {lessons.length === 0 && <p className="text-gray-500">אין שיעורים</p>}
+          </ul>
+        </div>
+
+        {/* תצוגה / עריכה של שיעור */}
+        <div className="lg:col-span-2 space-y-6">
+          {!selectedLesson ? (
+            <div className="p-6 bg-white rounded shadow text-center text-gray-500">בחר שיעור</div>
+          ) : (
+            <div className="space-y-4">
+              <div className="bg-white p-6 rounded shadow">
+                {editingLessonId === selectedLesson.folderId && isOwner ? (
+                  <>
+                    <input
+                      className="w-full border p-2 mb-2"
+                      value={lessonEditData.title}
+                      onChange={e => setLessonEditData({ ...lessonEditData, title: e.target.value })}
+                    />
+                    <textarea
+                      className="w-full border p-2 mb-2"
+                      value={lessonEditData.description}
+                      onChange={e => setLessonEditData({ ...lessonEditData, description: e.target.value })}
+                    />
+                    <div className="flex gap-2">
+                      <button className="bg-green-600 text-white px-3 py-1 rounded" onClick={saveLesson}>שמור</button>
+                      <button className="bg-gray-300 px-3 py-1 rounded" onClick={() => setEditingLessonId(null)}>ביטול</button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-xl">{selectedLesson.title}</h3>
+                    <p className="text-gray-700">{selectedLesson.description}</p>
+                  </>
+                )}
+
+                {isOwner && editingLessonId !== selectedLesson.folderId && (
+                  <div className="mt-3 flex gap-4">
+                    <button className="text-blue-600" onClick={() => setEditingLessonId(selectedLesson.folderId)}>ערוך</button>
+                    <button className="text-red-600" onClick={removeLesson}>מחק</button>
                   </div>
                 )}
               </div>
-            ))}
-          </div>
-        </div>
 
-        <div className="lg:col-span-2 space-y-6">
-          {selectedLesson ? (
-            <>
-              <div className="bg-white rounded shadow p-6">
-                <h3 className="text-lg font-semibold">{selectedLesson.title}</h3>
+              {/* אודיו ותמלול */}
+              <div className="bg-white p-6 rounded shadow">
                 {mediaUrl ? (
-                  <audio controls src={mediaUrl} className="w-full mt-4" />
+                  <audio controls src={mediaUrl} className="w-full" />
                 ) : (
-                  <p className="text-gray-500 mt-4">אין אודיו זמין.</p>
+                  <div className="text-gray-400">אין אודיו</div>
                 )}
-              </div>
-              <div className="bg-white rounded shadow p-6">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-semibold"><FileText className="inline-block mr-1" />תמלול</h3>
-                  <button
-                    onClick={() => {
-                      const blob = new Blob([transcript], { type: "text/plain;charset=utf-8" });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement("a");
-                      a.href = url;
-                      a.download = `${selectedLesson.title}.txt`;
-                      a.click();
-                      URL.revokeObjectURL(url);
-                    }}
-                    className="text-blue-600"
-                  >
-                    הורד תמלול
-                  </button>
+                <div className="mt-4">
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-lg">תמלול</h4>
+                    {transcript && (
+                      <button
+                        onClick={() => {
+                          const blob = new Blob([transcript], { type: "text/plain" })
+                          const url = URL.createObjectURL(blob)
+                          const a = document.createElement("a")
+                          a.href = url
+                          a.download = `${selectedLesson.title}.txt`
+                          a.click()
+                        }}
+                      >
+                        <Download />
+                      </button>
+                    )}
+                  </div>
+                  <div className="mt-2 h-40 overflow-auto border p-2 bg-gray-50">
+                    {loadingTranscript ? "טוען..." : (transcript || "אין תמלול")}
+                  </div>
                 </div>
-                {loadingTranscript ? (
-                  <div className="flex justify-center py-4"><div className="animate-spin border-b-2 border-blue-600 h-8 w-8 rounded-full" /></div>
-                ) : (
-                  <pre className="bg-gray-50 p-4 rounded max-h-72 overflow-y-auto whitespace-pre-wrap">{transcript}</pre>
-                )}
               </div>
-            </>
-          ) : (
-            <div className="bg-white rounded shadow p-6 text-center">
-              <p className="text-gray-500">בחר שיעור כדי לצפות</p>
             </div>
           )}
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CourseView;
+export default CourseView
