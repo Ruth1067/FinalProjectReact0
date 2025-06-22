@@ -281,7 +281,7 @@ const Home: React.FC = () => {
                 onClick={() => scrollToSection(3)}
                 className="text-gray-700 hover:text-blue-600 transition-colors"
               >
-                יתרונות
+                   יתרונות
               </button>
               <button
                 onClick={() => scrollToSection(4)}
@@ -368,7 +368,7 @@ const Home: React.FC = () => {
               )}
             </div>
 
-            Floating Elements
+            {/* Floating Elements */}
             <div className="relative">
               <div className="absolute -top-20 -left-20 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
               <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
