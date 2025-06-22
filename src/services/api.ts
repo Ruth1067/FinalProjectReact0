@@ -5,7 +5,7 @@ const API_BASE_URL = "https://learnaheadserver.onrender.com";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {}
+  // headers: {}
 });
 
 api.interceptors.request.use((config) => {
@@ -172,6 +172,17 @@ export const folderApi = {
 //     const response = await api.post("/upload/upload-file", formData);
 //     return response.data;
 //   },
+// export const uploadApi = {
+//   uploadFile: async (file: File, courseId: number, lessonId: number) => {
+//     const formData = new FormData();
+//     formData.append("file", file);
+//     formData.append("courseId", courseId.toString());
+//     formData.append("lessonId", lessonId.toString());
+
+//     const response = await api.post("/upload/upload-file", formData);
+//     return response.data;
+//   },
+
 export const uploadApi = {
   uploadFile: async (file: File, courseId: number, lessonId: number) => {
     const formData = new FormData();
@@ -179,9 +190,15 @@ export const uploadApi = {
     formData.append("courseId", courseId.toString());
     formData.append("lessonId", lessonId.toString());
 
-    const response = await api.post("/upload/upload-file", formData);
+    const response = await api.post("/upload/upload-file", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
     return response.data;
   },
+
 
   downloadLesson: async (mediaFileName: string, transcriptFileName: string) => {
     const response = await api.get("/upload/download-lesson", {
