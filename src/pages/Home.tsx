@@ -285,7 +285,7 @@ const Home: React.FC = () => {
               </button>
               <button
                 onClick={() => scrollToSection(4)}
-                className="text-gray-700 hover:text-blue-600 transition-colors"
+                className="text-gray-700 hover:text-blue-600 transition-colors ml-4"
               >
                 צור קשר
               </button>
@@ -677,7 +677,7 @@ const Home: React.FC = () => {
                 {
                   icon: Users,
                   title: "קהילה תומכת",
-                  description: "תמיכה 24/5 וקהילת משתמשים פעילה",
+                  description: "תמיכה 24/6 וקהילת משתמשים פעילה",
                 },
                 {
                   icon: Star,
@@ -708,7 +708,7 @@ const Home: React.FC = () => {
                     <div className="text-blue-100">דיוק תמלול</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">24/5</div>
+                    <div className="text-4xl font-bold mb-2">24/6</div>
                     <div className="text-blue-100">זמינות</div>
                   </div>
                   <div className="text-center">
@@ -782,7 +782,7 @@ const Home: React.FC = () => {
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
               <Users className="h-12 w-12 mx-auto mb-4" />
               <h3 className="text-xl font-bold mb-2">תמיכה מלאה</h3>
-              <p className="text-blue-100">צוות התמיכה שלנו כאן בשבילכם 24/5</p>
+              <p className="text-blue-100">צוות התמיכה שלנו כאן בשבילכם 24/6</p>
             </div>
           </div>
         </div>
