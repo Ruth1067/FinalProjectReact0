@@ -2093,7 +2093,7 @@ const AddLesson: React.FC = () => {
               value={formData.description}
               onChange={handleInputChange}
               className="block w-full px-4 py-3 border border-gray-200 rounded-xl resize-none"
-              placeholder="תאר את תוכן השיעור ומה התלמידים ילמדו"
+              placeholder="תאר את תוכן השיעור"
             />
           </div>
 

@@ -258,7 +258,7 @@ const Home: React.FC = () => {
               </span>
             </div>
 
-            <nav className="hidden md:flex space-x-8 space-x-reverse">
+            {/* <nav className="hidden md:flex space-x-8 space-x-reverse">
               <button
                 onClick={() => scrollToSection(0)}
                 className="text-gray-700 hover:text-blue-600 transition-colors"
@@ -289,7 +289,40 @@ const Home: React.FC = () => {
               >
                 צור קשר
               </button>
+            </nav> */}
+            <nav className="hidden md:flex gap-x-8">
+              <button
+                onClick={() => scrollToSection(0)}
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                בית
+              </button>
+              <button
+                onClick={() => scrollToSection(1)}
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                אודות
+              </button>
+              <button
+                onClick={() => scrollToSection(2)}
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                תכונות
+              </button>
+              <button
+                onClick={() => scrollToSection(3)}
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                יתרונות
+              </button>
+              <button
+                onClick={() => scrollToSection(4)}
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                צור קשר
+              </button>
             </nav>
+
 
             <div className="flex items-center space-x-4 space-x-reverse">
               {!user ? (
@@ -384,88 +417,88 @@ const Home: React.FC = () => {
 
       {/* About Section */}
       <section
-  id="section-1"
-  className={`scroll-section min-h-screen flex items-center py-20 transition-all duration-1000 delay-200 ${isVisible[1] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
->
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="text-center mb-16">
-      <h2 className="text-5xl font-bold text-gray-900 mb-6">
-        מה זה{" "}
-        <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          LearnAhead
-        </span>
-        ?
-      </h2>
-      <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-        פלטפורמה מהפכנית המשלבת טכנולוגיות AI מתקדמות עם חוויית למידה אנושית
-      </p>
-    </div>
-
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-      {/* למורים */}
-      <div className="order-1 lg:order-none bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-blue-100 transform hover:scale-105 transition-all duration-300">
-        <div className="flex items-center space-x-4 space-x-reverse mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
-            <Users className="h-8 w-8 text-white" />
+        id="section-1"
+        className={`scroll-section min-h-screen flex items-center py-20 transition-all duration-1000 delay-200 ${isVisible[1] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-gray-900 mb-6">
+              מה זה{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                LearnAhead
+              </span>
+              ?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              פלטפורמה מהפכנית המשלבת טכנולוגיות AI מתקדמות עם חוויית למידה אנושית
+            </p>
           </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">למורים</h3>
-            <p className="text-gray-600">כלים מתקדמים להוראה</p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+            {/* למורים */}
+            <div className="order-1 lg:order-none bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-blue-100 transform hover:scale-105 transition-all duration-300">
+              <div className="flex items-center space-x-4 space-x-reverse mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+                  <Users className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">למורים</h3>
+                  <p className="text-gray-600">כלים מתקדמים להוראה</p>
+                </div>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-center space-x-3 space-x-reverse">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <span>יצירת קורסים בקלות</span>
+                </li>
+                <li className="flex items-center space-x-3 space-x-reverse">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <span>העלאה אוטומטית ל-AWS</span>
+                </li>
+                <li className="flex items-center space-x-3 space-x-reverse">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <span>תמלול אוטומטי מתקדם</span>
+                </li>
+                <li className="flex items-center space-x-3 space-x-reverse">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <span>מעקב אחר תלמידים</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* לתלמידים */}
+            <div className="order-2 lg:order-none bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-purple-100 transform hover:scale-105 transition-all duration-300">
+              <div className="flex items-center space-x-4 space-x-reverse mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
+                  <BookOpen className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">לתלמידים</h3>
+                  <p className="text-gray-600">חוויית למידה מותאמת</p>
+                </div>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-center space-x-3 space-x-reverse">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <span>רכישת קורסים בקלות</span>
+                </li>
+                <li className="flex items-center space-x-3 space-x-reverse">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <span>צפייה בכל מקום ובכל זמן</span>
+                </li>
+                <li className="flex items-center space-x-3 space-x-reverse">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <span>הערות אישיות ושמירה</span>
+                </li>
+                <li className="flex items-center space-x-3 space-x-reverse">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <span>תמלולים מלאים</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-        <ul className="space-y-3">
-          <li className="flex items-center space-x-3 space-x-reverse">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span>יצירת קורסים בקלות</span>
-          </li>
-          <li className="flex items-center space-x-3 space-x-reverse">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span>העלאה אוטומטית ל-AWS</span>
-          </li>
-          <li className="flex items-center space-x-3 space-x-reverse">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span>תמלול אוטומטי מתקדם</span>
-          </li>
-          <li className="flex items-center space-x-3 space-x-reverse">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span>מעקב אחר תלמידים</span>
-          </li>
-        </ul>
-      </div>
-
-      {/* לתלמידים */}
-      <div className="order-2 lg:order-none bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-purple-100 transform hover:scale-105 transition-all duration-300">
-        <div className="flex items-center space-x-4 space-x-reverse mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
-            <BookOpen className="h-8 w-8 text-white" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">לתלמידים</h3>
-            <p className="text-gray-600">חוויית למידה מותאמת</p>
-          </div>
-        </div>
-        <ul className="space-y-3">
-          <li className="flex items-center space-x-3 space-x-reverse">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span>רכישת קורסים בקלות</span>
-          </li>
-          <li className="flex items-center space-x-3 space-x-reverse">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span>צפייה בכל מקום ובכל זמן</span>
-          </li>
-          <li className="flex items-center space-x-3 space-x-reverse">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span>הערות אישיות ושמירה</span>
-          </li>
-          <li className="flex items-center space-x-3 space-x-reverse">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span>תמלולים מלאים</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* <section
         id="section-1"
@@ -566,7 +599,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
             </div> */}
-          {/* </div>
+      {/* </div>
         </div>
       </section> */}
 
@@ -799,7 +832,7 @@ const Home: React.FC = () => {
               <span className="text-2xl font-bold">LearnAhead</span>
             </div>
             <div className="text-gray-400 text-center md:text-right">
-              <p>© 2025 LearnAhead. כל הזכויות שמורות.</p>
+              <p>©LearnAhead כל הזכויות שמורות.</p>
               <p className="text-sm mt-1">מערכת למידה מתקדמת לעתיד החינוך</p>
             </div>
           </div>
